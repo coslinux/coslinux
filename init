@@ -1,0 +1,105 @@
+mkfs -v -t ext4 /dev/<xxx> # on root partition
+mkfs -v -t ext4 /dev/<yyy> # on home partition
+export COS=/mnt/cos
+mkdir -pv $COS
+mount -v -t ext4 /dev/<xxx> $COS
+mkdir -v $COS/home
+mount -v -t ext4 /dev/<yyy> $COS/home
+mkswap /dev/<zzz> # swap if you need
+/sbin/swapon -v /dev/<zzz>
+
+mkdir -pv $COS/{etc,var} $COS/usr/{bin,lib,sbin}
+for i in bin lib sbin; do
+	ln -sv /$i $COS
+done
+ln -sv /usr/bin $COS/usr
+
+case $(uname -m) in
+	x86_64) mkdir -pv $COS/lib64 ;;
+esac
+
+mkdir -pv $COS/{dev,proc,sys,run}
+mount -v --bind /dev $COS/dev
+mount -vt devpts devpts -o gid=5,mode=0620 $COS/dev/pts
+mount -vt proc proc $COS/proc
+mount -vt sysfs sysfs $COS/sys
+mount -vt tmpfs tmpfs $COS/run
+if [ -h $COS/dev/shm ]; then
+	install -v -d -m 1777 $COS$(realpath /dev/shm)
+else
+	mount -vt tmpfs -o nosuid,nodev tmpfs $COS/dev/shm
+fi
+mkdir -pv /{boot,home,mnt,opt,srv}
+mkdir -pv /etc/{opt,sysconfig}
+mkdir -pv /lib/firmware
+mkdir -pv /usr/{,local/}{include,src}
+mkdir -pv /usr/local/{bin,lib,sbin}
+mkdir -pv /usr/{,local/}share/{doc,locale,man,misc,terminfo}
+mkdir -pv /usr/{,local/}share/man/man{1..8}
+mkdir -pv /var/{cache,local,log,mail,opt,spool}
+
+ln -sfv /run /var/run
+ln -sfv /run/lock /var/lock
+install -dv -m 0750 /root
+install -dv -m 1777 /tmp /var/tmp
+
+ln -sv /proc/self/mounts /etc/mtab
+
+cat > /etc/hosts << EOF
+127.0.0.1 localhost $(hostname)
+::1 localhost
+EOF
+
+cat > /etc/passwd << "EOF"
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/dev/null:/usr/bin/false
+daemon:x:6:6:daemon:/dev/null:/usr/bin/false
+messagebus:x:18:18:messagebus:/run/dbus:/usr/bin/false
+nobody:x:65534:65534:nobody:/dev/null:/usr/bin/false
+user:x:101:101::/home/user:/bin/sh
+EOF
+
+cat > /etc/group << "EOF"
+root:x:0:
+bin:x:1:daemon
+sys:x:2:
+kmem:x:3:
+tape:x:4:
+tty:x:5:
+daemon:x:6:
+floppy:x:7:
+disk:x:8:
+lp:x:9:
+dialout:x:10:
+audio:x:11:
+video:x:12:
+utmp:x:13:
+cdrom:x:15:
+adm:x:16:
+messagebus:x:18:
+input:x:24:
+mail:x:34:
+kvm:x:61:
+uuidd:x:80:
+wheel:x:97:
+users:x:999:
+nogroup:x:65534:
+user:x:101:
+EOF
+
+install -o user -d /home/user
+
+git clone https://repo.or.cz/tinycc
+cd tinycc
+./configure --config-musl --enable-static --disable-rpath --pr
+efix="/mnt/cos/usr" --extra-cflags="-O3 -mtune=native -march=native -pipe -s -flto"
+make
+ssu make install
+git clone https://git.suckless.org/sbase
+cd sbase
+make
+ssu make install
+git clone https://git.suckless.org/ubase
+cd ubase
+make
+ssu make install

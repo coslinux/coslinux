@@ -1,7 +1,7 @@
 # cos
+<img src="https://github.com/user-attachments/assets/dd623185-043c-4865-8534-93da12f915b7" width="100"/>  
 
 COS(Collection Of Suckless) is a tiny Linux distribution that aims to be as suckless as possible.
-<meta http-equiv="content-type" content="text/html; charset=utf-8"><img src="https://static-00.iconduck.com/assets.00/cosine-wave-icon-512x512-6ekfmoic.png" alt="https://static-00.iconduck.com/assets.00/cosine-wave-icon-512x512-6ekfmoic.png" class="transparent">
 
 # Software
 
