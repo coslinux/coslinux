@@ -1,0 +1,8 @@
+ssu mount /dev/nvme0n1p4 /mnt/cos
+ssu mount /dev/nvme0n1p5 /mnt/cos/home
+ssu mount -v --bind /dev $COS/dev
+ssu mount -vt devpts devpts -o gid=5,mode=0620 $COS/dev/pts
+ssu mount -vt proc proc $COS/proc
+ssu mount -vt sysfs sysfs $COS/sys
+ssu mount -vt tmpfs tmpfs $COS/run
+ssu mount -vt tmpfs -o nosuid,nodev tmpfs $COS/dev/shm

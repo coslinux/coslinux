@@ -91,15 +91,104 @@ install -o user -d /home/user
 
 git clone https://repo.or.cz/tinycc
 cd tinycc
-./configure --config-musl --enable-static --disable-rpath --pr
-efix="/mnt/cos/usr" --extra-cflags="-O3 -mtune=native -march=native -pipe -s -flto"
+./configure --config-musl --enable-static --disable-rpath --prefix="/mnt/cos/usr" --extra-cflags="-O3 -mtune=native -march=native -pipe -s -flto"
 make
-ssu make install
+ssu make DESTDIR=/mnt/cos install
 git clone https://git.suckless.org/sbase
 cd sbase
 make
-ssu make install
+ssu make DESTDIR=/mnt/cos install
 git clone https://git.suckless.org/ubase
 cd ubase
 make
-ssu make install
+ssu make DESTDIR=/mnt/cos install
+git clone https://git.musl-libc.org/git/musl
+cd musl
+./configure
+make
+make DESTDIR=/mnt/cos install
+
+cat > /etc/fstab << "EOF"
+/dev/nvme0n1p4	/				ext4		rw,relatime 0 1
+/dev/nvme0n1p5	/home			ext4		rw,relatime 0 2
+proc			/proc			proc		nosuid,noexec,nodev 0 0
+sysfs			/sys			sysfs		nosuid,noexec,nodev 0 0
+devpts			/dev/pts		devpts		gid=5,mode=620 0 0
+tmpfs			/run			tmpfs		defaults 0 0
+devtmpfs		/dev			devtmpfs	mode=0755,nosuid 0 0
+tmpfs			/dev/shm		tmpfs		nosuid,nodev 0 0
+cgroup2			/sys/fs/cgroup	cgroup2		nosuid,noexec,nodev 0 0
+EOF
+echo "cos" > /etc/hostname
+cat > /etc/inputrc << "EOF"
+# /etc/inputrc - global inputrc for libreadline
+# See readline(3readline) and `info rluserman' for more information.
+
+# Be 8 bit clean.
+set input-meta on
+set output-meta on
+
+# To allow the use of 8bit-characters like the german umlauts, uncomment
+# the line below. However this makes the meta key not work as a meta key,
+# which is annoying to those which don't need to type in 8-bit characters.
+
+# set convert-meta off
+
+# try to enable the application keypad when it is called.  Some systems
+# need this to enable the arrow keys.
+# set enable-keypad on
+
+# see /usr/share/doc/bash/inputrc.arrows for other codes of arrow keys
+
+# do not bell on tab-completion
+# set bell-style none
+# set bell-style visible
+
+# some defaults / modifications for the emacs mode
+$if mode=emacs
+
+# allow the use of the Home/End keys
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+# allow the use of the Delete/Insert keys
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+
+# mappings for "page up" and "page down" to step to the beginning/end
+# of the history
+# "\e[5~": beginning-of-history
+# "\e[6~": end-of-history
+
+# alternate mappings for "page up" and "page down" to search the history
+# "\e[5~": history-search-backward
+# "\e[6~": history-search-forward
+
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e\e[C": forward-word
+"\e\e[D": backward-word
+
+$if term=rxvt
+"\e[7~": beginning-of-line
+"\e[8~": end-of-line
+"\eOc": forward-word
+"\eOd": backward-word
+$endif
+
+# for non RH/Debian xterm, can't hurt for RH/Debian xterm
+# "\eOH": beginning-of-line
+# "\eOF": end-of-line
+
+# for freebsd console
+# "\e[H": beginning-of-line
+# "\e[F": end-of-line
+
+$endif
+EOF
+cat > /etc/shells << "EOF"
+/bin/sh
+EOF
