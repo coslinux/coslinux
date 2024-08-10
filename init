@@ -93,20 +93,33 @@ git clone https://repo.or.cz/tinycc
 cd tinycc
 ./configure --config-musl --enable-static --disable-rpath --prefix="/mnt/cos/usr" --extra-cflags="-O3 -mtune=native -march=native -pipe -s -flto"
 make
-ssu make DESTDIR=/mnt/cos install
+make install
 git clone https://git.suckless.org/sbase
 cd sbase
 make
-ssu make DESTDIR=/mnt/cos install
+make install
 git clone https://git.suckless.org/ubase
 cd ubase
 make
-ssu make DESTDIR=/mnt/cos install
+make install
 git clone https://git.musl-libc.org/git/musl
 cd musl
 ./configure
 make
-make DESTDIR=/mnt/cos install
+make install
+git clone https://github.com/zlib-ng/zlib-ng
+cd zlib-ng
+./configure --zlib-compat
+make
+make install
+tar -xf make-4.4.1.tar.gz
+./configure --prefix=/mnt/cos/usr
+make
+ssu make install
+tar -xf gettext-0.22.5.tar.gz
+./configure --enable-threads=posix --disable-java --enable-static --prefix=/mnt/cos/usr
+make
+ssu make install
 
 cat > /etc/fstab << "EOF"
 /dev/nvme0n1p4	/				ext4		rw,relatime 0 1
