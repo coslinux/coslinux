@@ -14,7 +14,7 @@ COS(Collection Of Suckless) is a tiny Linux distribution that aims to be as suck
 - File Manager: ccc
 - Window Manager: dwl
 - Dmenu: mew
-- Misc: mandoc, libressl, zlib-ng, make, gettext
+- Misc: mandoc, libressl, zlib-ng, make, gettext, git
 
 # Download
 Currently none.

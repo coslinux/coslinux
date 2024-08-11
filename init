@@ -205,3 +205,8 @@ EOF
 cat > /etc/shells << "EOF"
 /bin/sh
 EOF
+
+tar -xf git-2.46.0.tar.gz
+cd git-2.46.0
+# run as root
+NO_GETTEXT=YesPlease NO_SVN_TESTS=YesPlease NO_REGEX=YesPlease ICONV_OMITS_BOM=Yes NO_SYS_POLL_H=1 NO_PYTHON=YesPlease NO_PERL=YesPlease NO_TCLTK=YesPlease make DESTDIR=/mnt/cos install
